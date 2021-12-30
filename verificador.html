@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Verificador Mega-sena</title>
+</head>
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+		font-family: sans-serif;
+	}
+	#jogos{
+		margin: 0 auto;
+		margin-top: 50px;
+		margin-bottom: 50px;
+		width: 85%;
+		border: 1px solid #ccc;
+		padding: 10px;
+	}
+	#jogos h2{
+		text-align: center;
+		margin-bottom: 10px;
+	}
+	.resultado{
+		margin-bottom: 30px;
+	}
+	.full-width{
+		width: 100%;
+		margin-bottom: 10px;
+		text-align: center;
+		padding: 3px;
+	}
+	.col-4:last-child{
+		margin-right: 0;
+	}
+	.col-4{
+		margin-right: 2%;
+		width: 32%;
+		float: left;
+	}
+	.jogador{
+		width: 100%;
+		margin-bottom: 20px;
+		text-align: center;
+	}
+	.jogador > div{
+		display: block;
+		font-size: 0.8em;
+		text-transform: uppercase;
+		font-weight: bold;
+		margin-bottom: 10px;
+	}
+	.jogos{
+		display: block;
+	}
+	.jogos > div{
+		display: block;
+		margin-bottom: 7px;
+	}
+	.jogos .jogo{
+		background: #fff;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		padding: 7px;
+		display: inline-block;
+		margin-right: 7px;
+		font-weight: bold;
+		width: 35px;
+		text-align: center;
+		box-shadow: 1px 1px 1px #717171;
+		margin-bottom: 7px;
+	}
+	.jogos .jogo.error{
+		background: red;
+		border-color: red;
+		color: #fff;
+	}
+	.jogos .jogo.success{
+		background: green;
+		border-color: green;
+		color: #fff;
+	}
+	.hide{
+		display: none;
+		opacity: 0;
+	}
+	.mb20{
+		margin-bottom: 20px;
+	}
+	.assinatura{
+		text-align: center;
+		margin-bottom: 30px;
+	}
+</style>
+<body>
+	<div id="jogos">
+		<h2>
+			Mega-sena
+			<br>
+			<span>💸💸💸</span>
+		</h2>
+		<div class="linha">
+			<div class="resultado-online mb20 hide">
+				<p class="numero-concurso"></p>
+				<p class="data-concurso"></p>
+				<p class="dezenas-concurso"></p>
+			</div>
+		</div>
+		<div class="linha">
+			<div class="col-4">
+				<input type="number" maxlength="2" min="1" max="60" class="full-width dezenas">
+			</div>
+			<div class="col-4">
+				<input type="number" maxlength="2" min="1" max="60" class="full-width dezenas">
+			</div>
+			<div class="col-4">
+				<input type="number" maxlength="2" min="1" max="60" class="full-width dezenas">
+			</div>
+		</div>
+		<div class="linha">
+			<div class="col-4">
+				<input type="number" maxlength="2" min="1" max="60" class="full-width dezenas">
+			</div>
+			<div class="col-4">
+				<input type="number" maxlength="2" min="1" max="60" class="full-width dezenas">
+			</div>
+			<div class="col-4">
+				<input type="number" maxlength="2" min="1" max="60" class="full-width dezenas">
+			</div>
+		</div>
+		<button id="verificar-offline" class="full-width">
+			VERIFICAR RESULTADO - OFFLINE
+		</button>
+		<button id="verificar-online" class="full-width">
+			VERIFICAR RESULTADO - ONLINE
+		</button>
+	</div>
+	<div class="assinatura">
+		Criado por:
+		<strong>
+			Leandro H. Agostinho
+		</strong>
+		<br>
+		GitHub:
+		<a href="https://github.com/leandrohago/" target="_blank" rel="noopener noreferrer">
+			https://github.com/leandrohago/
+		</a>
+	</div>
+</body>
+
+<script>
+	const jogos = [
+		{
+			jogador: 'Jogador_1',
+			jogos: [
+				[05,17,18,30,32,38,43,49,56,60],
+				[03,10,15,19,24,27,37,46,48,49],
+			]
+		},
+		{
+			jogador: 'Jogador_2',
+			jogos: [
+				[01,16,23,28,39,44,47,50,55,59],
+			]
+		},
+	]
+
+	const compararResultado = function(jogador, nJogo, array, resultado){
+		let dezenas = document.querySelectorAll(`[data-jogo="${jogador}-${nJogo}"] span`)
+
+		let n = []
+		array.forEach(function(item, idx){
+			dezenas[idx].classList.remove('error', 'success')
+			if(resultado.indexOf(item) == -1 ){
+				dezenas[idx].classList.add('error')
+			}else{
+				dezenas[idx].classList.add('success')
+			}
+		})
+	}
+
+	const confereJogo = function(jogos, resultado){
+		jogos.forEach(function(jogo){
+			jogo.jogos.forEach(function(item, idx){
+				compararResultado(jogo.jogador, idx, item, resultado)
+			})
+		})
+	}
+
+	const imprimeJogos = function(jogos){
+		let divJogos = document.getElementById('jogos')
+
+		let divJogador = document.createElement('div')
+		divJogador.classList = 'jogador'
+		divJogador.setAttribute('data-jogador', jogos.jogador)
+		let jogador = document.createElement('div')
+		let jogadorNome = jogos.jogador
+		jogador.innerHTML = jogadorNome
+		divJogador.appendChild(jogador)
+
+		let divJogadorJogos = document.createElement('div')
+		divJogadorJogos.classList = 'jogos'
+
+		jogos.jogos.forEach(function(jogos,idx){
+			let divJogo1 = document.createElement('div')
+			divJogo1.setAttribute('data-jogo', jogadorNome+'-'+idx)
+			jogos.forEach(function(item,idx){
+				let divJogo = document.createElement('span')
+				divJogo.classList = 'jogo'
+				divJogo.innerHTML = item
+				divJogo1.appendChild(divJogo)
+			})
+			divJogadorJogos.appendChild(divJogo1)
+		})
+		divJogador.appendChild(divJogadorJogos)
+		divJogos.appendChild(divJogador)
+	}
+
+	jogos.forEach(function(item){
+		imprimeJogos(item)
+	})
+
+	const pegaResultado = async function (){
+		let url = 'https://loteriascaixa-api.herokuapp.com/api/mega-sena/latest'
+		try {
+			const response = await fetch(url)
+
+			if(!response.ok){
+				const message = `Ocorreu um erro: ${response.status}\nUtilize a verificação offline`;
+				alert(message)
+				throw new Error(message)
+			}
+
+			const result = await response.json()
+			return result
+
+		} catch (error) {
+			const message = `Falha ao acessar o endereço:
+				\r${url}
+				\rErro: ${error.message}
+				\rUtilize a verificação offline`;
+			alert(message)
+			throw new Error(message)
+		}
+	}
+
+	const imprimeDetalhes = function(elemento, texto){
+		document.querySelector(elemento).innerHTML = texto
+	}
+
+	const addClass = function(elemento, classe){
+		try {
+			let element = document.querySelector(elemento).classList.add(classe)
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	const removeClass = function(elemento, classe){
+		try {
+			let element = document.querySelector(elemento).classList.remove(classe)
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	document.getElementById('verificar-online').addEventListener("click",function(){
+		pegaResultado().then(result => {
+			let resultado = []
+
+			removeClass('.resultado-online', 'hide')
+			imprimeDetalhes('.resultado-online .numero-concurso', `Concurso nº: ${result.concurso}`)
+			imprimeDetalhes('.resultado-online .data-concurso', `Data do consurso: ${result.data}`)
+			imprimeDetalhes('.resultado-online .dezenas-concurso', `Dezenas sorteadas: ${result.dezenas}`)
+
+			if(result.dezenas.length > 0){
+				result.dezenas.forEach((value,idx) => {
+					resultado.push(parseInt(value))
+				})
+				confereJogo(jogos, resultado)
+			}
+		})
+	})
+
+	document.getElementById('verificar-offline').addEventListener("click",function(){
+		addClass('.resultado-online', 'hide')
+
+		let dezenas = document.getElementsByClassName('dezenas')
+		let resultado = []
+
+		for(n=0; n<dezenas.length; n++){
+			resultado.push(parseInt(dezenas[n].value))
+		}
+
+		confereJogo(jogos, resultado)
+	})
+
+</script>
+</html>
