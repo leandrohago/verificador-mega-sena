@@ -4,6 +4,9 @@ Um verificador simples de jogos da mega-sena para quem participa de bolões e pr
 
 O arquivo consiste em um único **html** com **css** e **javascript** para facilitar a conferência em celulares.
 
+# Visualização
+[https://leandrohago.github.io/verificador-mega-sena/verificador.html](https://leandrohago.github.io/verificador-mega-sena/verificador.html)
+
 # Configurando
 
 Edite o **array** de objetos **jogos**
